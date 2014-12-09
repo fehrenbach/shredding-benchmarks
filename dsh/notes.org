@@ -1,0 +1,839 @@
+* Nested1
+** DSH
+*** SQL
+SELECT 1 AS iter4_nat,
+        ROW_NUMBER () OVER (ORDER BY a0000.a ASC, a0000.v ASC) AS item3_nat
+   FROM t1 AS a0000
+  ORDER BY a0000.a ASC, a0000.v ASC;
+
+WITH
+-- binding due to rank operator
+t0000 (item1_int, item2_int, item3_nat) AS
+  (SELECT a0001.a AS item1_int, a0001.v AS item2_int,
+          DENSE_RANK () OVER (ORDER BY a0001.a ASC, a0001.v ASC) AS item3_nat
+     FROM t1 AS a0001)
+
+SELECT ROW_NUMBER () OVER
+        (ORDER BY a0002.item3_nat ASC, a0000.a ASC, a0000.b ASC) AS
+        item12_nat, a0002.item3_nat AS item10_nat
+   FROM t2 AS a0000,
+        t0000 AS a0002,
+        t0000 AS a0003
+  WHERE a0002.item3_nat = a0003.item3_nat
+    AND a0000.a = a0003.item2_int
+  ORDER BY a0002.item3_nat ASC, a0000.a ASC, a0000.b ASC;
+
+WITH
+-- binding due to rank operator
+t0000 (item6_int, item7_int, item4_int, item5_int, item18_nat) AS
+  (SELECT a0000.a AS item6_int, a0000.v AS item7_int, a0001.a AS item4_int,
+          a0001.b AS item5_int,
+          DENSE_RANK () OVER
+          (ORDER BY a0000.a ASC, a0000.v ASC, a0001.a ASC, a0001.b ASC) AS
+          item18_nat
+     FROM t1 AS a0000,
+          t2 AS a0001
+    WHERE a0000.v = a0001.a)
+
+SELECT a0003.v AS item16_int, a0002.item18_nat AS item14_nat
+   FROM t0000 AS a0002,
+        t3 AS a0003
+  WHERE a0002.item5_int = a0003.b
+  ORDER BY a0002.item18_nat ASC, a0003.b ASC, a0003.v ASC;
+
+*** Raw
+stefan@stefan-work:~/src/shredding-benchmarks/dsh$ time ./dist/build/dsh-shredding-benchmark/dsh-shredding-benchmark
+<query_plan_bundle>
+  <query_plan id="0">
+    <properties>
+      <property name="cs">
+        <property name="offset" value="1">
+          <property name="type" value="nat"/>
+        </property>
+      </property>
+      <property name="overallResultType" value="LIST"/>
+    </properties>
+    <schema>
+      <column name="iter4" function="iter"/>
+      <column name="item3" new="false" function="item" position="0"/>
+    </schema>
+    <query><![CDATA[
+SELECT 1 AS iter4_nat,
+        ROW_NUMBER () OVER (ORDER BY a0000.a ASC, a0000.v ASC) AS item3_nat
+   FROM t1 AS a0000
+  ORDER BY a0000.a ASC, a0000.v ASC;
+]]></query>
+  </query_plan>
+  <query_plan id="1" idref="0" colref="1">
+    <properties>
+      <property name="cs">
+        <property name="offset" value="1">
+          <property name="type" value="nat"/>
+        </property>
+      </property>
+    </properties>
+    <schema>
+      <column name="item10" function="iter"/>
+      <column name="item12" new="false" function="item" position="0"/>
+    </schema>
+    <query><![CDATA[
+WITH
+-- binding due to rank operator
+t0000 (item1_int, item2_int, item3_nat) AS
+  (SELECT a0001.a AS item1_int, a0001.v AS item2_int,
+          DENSE_RANK () OVER (ORDER BY a0001.a ASC, a0001.v ASC) AS item3_nat
+     FROM t1 AS a0001)
+
+SELECT ROW_NUMBER () OVER
+        (ORDER BY a0002.item3_nat ASC, a0000.a ASC, a0000.b ASC) AS
+        item12_nat, a0002.item3_nat AS item10_nat
+   FROM t2 AS a0000,
+        t0000 AS a0002,
+        t0000 AS a0003
+  WHERE a0002.item3_nat = a0003.item3_nat
+    AND a0000.a = a0003.item2_int
+  ORDER BY a0002.item3_nat ASC, a0000.a ASC, a0000.b ASC;
+]]></query>
+  </query_plan>
+  <query_plan id="2" idref="1" colref="1">
+    <properties>
+      <property name="cs">
+        <property name="offset" value="1">
+          <property name="type" value="int"/>
+        </property>
+      </property>
+    </properties>
+    <schema>
+      <column name="item14" function="iter"/>
+      <column name="item16" new="false" function="item" position="0"/>
+    </schema>
+    <query><![CDATA[
+WITH
+-- binding due to rank operator
+t0000 (item6_int, item7_int, item4_int, item5_int, item18_nat) AS
+  (SELECT a0000.a AS item6_int, a0000.v AS item7_int, a0001.a AS item4_int,
+          a0001.b AS item5_int,
+          DENSE_RANK () OVER
+          (ORDER BY a0000.a ASC, a0000.v ASC, a0001.a ASC, a0001.b ASC) AS
+          item18_nat
+     FROM t1 AS a0000,
+          t2 AS a0001
+    WHERE a0000.v = a0001.a)
+
+SELECT a0003.v AS item16_int, a0002.item18_nat AS item14_nat
+   FROM t0000 AS a0002,
+        t3 AS a0003
+  WHERE a0002.item5_int = a0003.b
+  ORDER BY a0002.item18_nat ASC, a0003.b ASC, a0003.v ASC;
+]]></query>
+  </query_plan>
+</query_plan_bundle>
+
+[[[97528,103509,121806,306791,350041,375204,855170,942065,965111,973525],[130886,420404,480298,554881,605157,629317,667712,764164,880623,993499],[90359,116469,166331,379666,393359,401441,476239,906385,907288,988260],[121815,221309,275762,276372,296506,460713,465995,666788,735548,819370],[126337,225171,312780,469833,500838,501553,598675,624851,745024,816039],[76994,296104,313931,354395,525787,528068,614830,701977,710345,982611],[29439,137383,398112,432958,433421,530101,670127,857441,863199,988344],[13502,31855,193522,305813,559163,672366,825113,913842,968073,974475],[12496,24165,100228,284810,663731,717629,783033,823971,862954,983765],[149039,158856,162112,198770,265689,360502,767063,882565,890276,950525]],[[11171,105440,148607,249382,302970,585416,742557,780400,956656,994378],[140820,205881,295797,337780,404666,476712,694373,720903,751388,999114],[353569,572945,625833,638766,651976,734754,748097,756010,891884,983427],[9002,42893,75885,115379,267768,298293,531854,786674,882109,998510],[75706,111308,216246,378621,490907,495333,505413,575485,579671,719402],[49297,134674,364227,483118,556376,570124,705461,831167,951617,979841],[65960,93355,162393,377089,461012,486902,795264,815232,854032,877064],[3239,71174,154962,709520,736854,745687,785159,793602,923766,948021],[155343,251606,324526,336911,496409,525181,601209,662728,716791,842917],[11413,16441,235770,254420,272375,308066,351332,403790,895550,988862]],[[387531,630727,634941,635027,694195,786907,850437,894140,912240,917958],[184706,199014,301522,325806,407482,479938,555389,804404,826686,961029],[21735,61286,75221,249418,277803,366502,560748,688476,793987,992779],[8653,27251,115448,407738,433691,447252,458294,501487,939431,963490],[51373,118068,410339,412722,422153,469648,477336,646795,767220,891436],[103578,192880,226719,251053,450847,567488,699055,844322,876735,890467],[165252,463016,488436,549602,598781,782401,907532,928011,942265,948977],[21099,396529,398847,470305,579244,646047,705244,768199,948577,967307],[105393,150187,294189,302958,415798,460933,628091,785216,870090,953424],[43634,56435,373363,426735,587029,590850,645943,751763,830799,843082]],[[95687,274249,284957,325424,448605,464964,772152,847184,953661,954536],[60891,188842,230639,240966,333317,374901,450605,663507,916743,995841],[65159,76944,84372,234529,251335,531938,631894,648391,844832,879361],[15013,54844,103635,399087,581895,646722,683228,790889,920270,943608],[247385,256575,292633,420083,440920,620265,698888,813047,887784,975907],[153264,194648,288121,319682,412101,680202,822500,840169,858596,929067],[69032,87115,195114,235235,253497,260714,285317,309242,434351,880560],[26721,118456,211097,319856,432565,516495,581946,604972,634864,849215],[21588,110546,209996,250097,262460,329212,384465,437739,781565,920670],[51693,179616,344611,557830,560318,570249,678637,766251,877237,913511]],[[277558,306649,396008,447952,480032,516363,637155,713369,754441,882042],[312299,446195,471753,518324,561942,700407,752205,795974,898904,956927],[2298,209941,468202,494547,532145,577009,896093,909009,969734,971925],[342980,399856,423169,445605,586672,594641,659440,710076,718065,921662],[4464,40981,166709,435674,455573,509824,689453,794230,831337,988371],[143261,230777,258134,333064,646815,667318,711872,808738,903166,926032],[17239,95913,178289,230675,260902,431896,566833,601713,920308,976336],[177520,179989,186900,374036,444387,525012,583671,634559,839053,843616],[90356,133093,369157,438957,557243,641081,755215,815115,831004,960098],[107816,166389,245923,308823,420296,623088,642195,691016,718433,977140]],[[90681,171050,288156,369123,388806,426890,718011,758688,821012,894769],[54967,103361,155658,174854,761422,861561,905162,926939,952007,999699],[140217,345511,507556,507718,550752,644556,732917,752529,847973,884268],[64678,143863,190866,227432,428284,483609,489748,497132,525608,602709],[4887,46623,313112,454289,528100,536100,577201,777267,921790,942916],[134739,252145,324996,456581,476569,498898,633924,683478,818080,925170],[28998,188312,204820,350606,413232,435676,580527,615931,631743,839341],[8112,38084,114912,178990,343291,481818,659407,672204,896981,979109],[95008,106476,439476,464980,763433,840696,894330,917503,918038,991965],[198523,270193,407394,410423,444121,457515,590324,713174,750148,757392]],[[193975,250176,404687,543402,583261,782722,791691,858299,958245,961938],[111247,175506,196502,412615,456785,502169,586909,742123,877690,944753],[296635,586430,590467,722024,749436,776598,782340,883222,942028,951332],[178797,216204,332952,565336,594734,685045,763991,855518,856513,908211],[38680,197839,356697,363089,527773,756926,807009,817398,900649,909621],[40085,104379,128570,217967,230911,298777,361680,594329,859168,983451],[147810,193068,253566,262594,404255,437153,605007,624297,773794,804979],[21141,22205,154360,452301,486926,682207,917293,950548,966836,973341],[1220,64175,158793,296714,303373,524604,628280,653196,701442,788770],[301391,359466,376132,418308,691457,728046,835941,867828,893128,984906]],[[124626,188834,253902,273880,279594,316899,642253,689885,819708,822631],[24122,63464,150109,312355,396799,635491,749943,787299,986719,991446],[43954,245082,318220,326713,326730,328744,345554,423957,682937,948398],[23081,64572,95817,147176,451461,610851,623305,701020,969850,994032],[66155,111895,174188,290013,525749,542717,688092,831272,837322,884499],[13440,380112,544816,573546,580300,612545,675846,676991,691874,857498],[20075,245883,286097,308325,345598,457049,496081,568316,714986,764027],[16536,158153,178258,376758,658322,671049,725624,742155,792162,970293],[48449,68420,73242,100660,402123,613116,615702,713223,753052,859527],[201642,325351,408188,422331,712910,746712,803812,814269,931456,947963]],[[41604,118972,220437,277235,339772,437246,651654,760109,845755,903402],[3305,244607,334636,407339,450185,465365,498077,612689,751085,869800],[24735,35541,205289,272707,317625,625710,759393,803827,881463,929129],[60591,121788,161790,270160,270341,308942,465249,809328,870265,893915],[84328,166208,261141,285987,295756,411362,581114,619488,632953,697744],[125585,137096,211905,424970,449975,653684,696021,716565,766580,940592],[22698,351272,384216,497718,578598,592341,658929,857663,901175,961278],[31597,98264,102383,168068,181891,319298,454611,595832,669800,679674],[16177,159128,363077,369483,501308,558700,564793,647746,703803,722418],[41786,57831,291362,382241,557874,755580,780483,820364,891908,970295]],[[125595,283924,309869,429372,490555,575633,576781,790182,962435,986062],[124185,148996,411556,448070,523070,548534,575329,659928,720536,971735],[226481,307430,408468,559794,615726,780118,875560,881365,936010,947850],[134950,393134,409087,439680,501764,673017,696154,707475,725780,848013],[81845,115655,160334,160639,180834,187870,352413,523961,686774,722846],[57746,258837,420772,440141,473161,613753,632307,667369,805173,865713],[51247,55846,246462,394664,405293,444295,537536,653563,804925,953430],[17111,19049,98770,134966,355870,445702,543636,671138,733156,914468],[88534,166594,353318,361998,379000,467222,542681,645589,697249,869839],[53127,84802,229729,293961,463809,512450,606056,626604,698324,985215]]]
+
+real    0m0.050s
+user    0m0.040s
+sys     0m0.003s
+** Sand
+*** SQL
+SELECT 1 AS iter4_nat,
+        ROW_NUMBER () OVER (ORDER BY a0000.v ASC, a0000.a ASC) AS iter3_nat
+   FROM t1 AS a0000
+  ORDER BY a0000.v ASC, a0000.a ASC;
+
+
+WITH
+-- binding due to rank operator
+t0000 (item1_int, item2_int, iter3_nat) AS
+  (SELECT a0000.a AS item1_int, a0000.v AS item2_int,
+          DENSE_RANK () OVER (ORDER BY a0000.v ASC, a0000.a ASC) AS iter3_nat
+     FROM t1 AS a0000),
+
+-- binding due to rownum operator
+t0001 (item1_int, iter3_nat, item4_int, item5_int, iter14_nat) AS
+  (SELECT a0001.item1_int, a0001.iter3_nat, a0002.a AS item4_int,
+          a0002.b AS item5_int,
+          ROW_NUMBER () OVER
+          (ORDER BY a0001.iter3_nat ASC, a0002.a ASC, a0002.b ASC) AS iter14_nat
+     FROM t0000 AS a0001,
+          t2 AS a0002)
+
+SELECT a0003.iter14_nat AS iter9_nat, a0003.iter3_nat
+   FROM t0001 AS a0003,
+        t0000 AS a0004
+  WHERE a0003.iter3_nat = a0004.iter3_nat
+    AND a0004.item1_int = a0003.item4_int
+  ORDER BY a0003.iter3_nat ASC, a0003.iter14_nat ASC;
+
+
+WITH
+-- binding due to rank operator
+t0000 (item3_int, item4_int, item1_int, item2_int, iter30_nat) AS
+  (SELECT a0001.a AS item3_int, a0001.v AS item4_int, a0002.a AS item1_int,
+          a0002.b AS item2_int,
+          DENSE_RANK () OVER
+          (ORDER BY a0001.v ASC, a0001.a ASC, a0002.a ASC, a0002.b ASC) AS
+          iter30_nat
+     FROM t1 AS a0001,
+          t2 AS a0002)
+
+SELECT a0003.iter30_nat AS iter24_nat, a0000.v AS item23_int
+   FROM t3 AS a0000,
+        t0000 AS a0003,
+        t0000 AS a0004,
+        t0000 AS a0005,
+        t0000 AS a0006,
+        t0000 AS a0007
+  WHERE a0003.iter30_nat = a0004.iter30_nat
+    AND a0003.iter30_nat = a0005.iter30_nat
+    AND a0006.iter30_nat = a0007.iter30_nat
+    AND a0003.iter30_nat = a0006.iter30_nat
+    AND a0006.item3_int = a0007.item1_int
+    AND a0003.item3_int = a0004.item1_int
+    AND a0000.b = a0005.item2_int
+  ORDER BY a0003.iter30_nat ASC, a0003.iter30_nat ASC, a0000.b ASC, a0000.v ASC;
+
+*** Raw
+stefan@stefan-work:~/src/links.shredding/benchmarks (detached from 275c880)$ time ~/src/links.sand/links --config=config nested1-sand.links 
+Reusing prelude.links.cache
+Reusing nested1-sand.links.cache
+remaining freevars {}
+primitive_free_vars {15, 38, 39, 117}
+>>>>> before
+`Let ([(117, `Primitive "AsList"); (39, `Primitive "Cons"); (38, `Concat []);
+       (15, `Primitive "==");
+       (1575,
+        `Table ((..., "postgresql:nested1:localhost:5432:stefan:links"),
+                "t3", [["b"; "v"]],
+                ({"b" => (`Present, `Primitive `Int) "v" => (`Present,
+                                                             `Primitive `Int) }, ,
+                 ...)));
+       (1574,
+        `Table ((..., "postgresql:nested1:localhost:5432:stefan:links"),
+                "t2", [["a"; "b"]],
+                ({"a" => (`Present, `Primitive `Int) "b" => (`Present,
+                                                             `Primitive `Int) }, ,
+                 ...)));
+       (1573,
+        `Table ((..., "postgresql:nested1:localhost:5432:stefan:links"),
+                "t1", [["v"; "a"]],
+                ({"a" => (`Present, `Primitive `Int) "v" => (`Present,
+                                                             `Primitive `Int) }, ,
+                 ...))); (159, `Primitive "concatMap");
+       (1598,
+        `Lambda ([1597],
+                 `Let ([(1583, `Variable 1597); (1584, `Variable 1597);
+                        (1596,
+                         `Let ([(1594,
+                                 `Lambda ([1593],
+                                          `Let ([(1585, `Variable 1593);
+                                                 (1586, `Variable 1593)],
+                                                `If (`Apply (`Variable 15,
+                                                             [`Project 
+                                                              ("a",
+                                                               `Variable 1584);
+                                                              `Project 
+                                                              ("a",
+                                                               `Variable 1586)]),
+                                                     `Let ([(1592,
+                                                             `Let ([(1590,
+                                                                    `Lambda 
+                                                                    ([1589],
+                                                                    `Let 
+                                                                    ([(1587,
+                                                                    `Variable 1589);
+                                                                    (1588,
+                                                                    `Variable 1589)],
+                                                                    `If 
+                                                                    (`Apply 
+                                                                    (`Variable 15,
+                                                                    [`Project 
+                                                                    ("b",
+                                                                    `Variable 1586);
+                                                                    `Project 
+                                                                    ("b",
+                                                                    `Variable 1588)]),
+                                                                    `Let 
+                                                                    ([],
+                                                                    `Apply 
+                                                                    (`Variable 39,
+                                                                    [`Project 
+                                                                    ("v",
+                                                                    `Variable 1588);
+                                                                    `Variable 38])),
+                                                                    Some
+                                                                    `Let 
+                                                                    ([],
+                                                                    `Variable 38)))));
+                                                                    (1591,
+                                                                    `Apply 
+                                                                    (`Variable 117,
+                                                                    [`Variable 1575]))],
+                                                                   `Apply 
+                                                                   (`Variable 159,
+                                                                    [`Variable 1590;
+                                                                    `Variable 1591])))],
+                                                           `Apply (`Variable 39,
+                                                                   [`Variable 1592;
+                                                                    `Variable 38])),
+                                                     Some
+                                                       `Let ([],
+                                                             `Variable 38)))));
+                                (1595,
+                                 `Apply (`Variable 117, [`Variable 1574]))],
+                               `Apply (`Variable 159,
+                                       [`Variable 1594; `Variable 1595])))],
+                       `Apply (`Variable 39, [`Variable 1596; `Variable 38]))));
+       (1599, `Apply (`Variable 117, [`Variable 1573]))],
+      `Apply (`Variable 159, [`Variable 1598; `Variable 1599]))
+encountered 1597
+encountered 1597
+encountered 1593
+encountered 1593
+encountered 38
+encountered 1589
+encountered 1589
+encountered 38
+encountered 1588
+encountered 38
+encountered 39
+encountered 1586
+encountered 1588
+encountered 15
+encountered 1575
+encountered 117
+encountered 1590
+encountered 1591
+encountered 159
+encountered 1592
+encountered 38
+encountered 39
+encountered 1584
+encountered 1586
+encountered 15
+encountered 1574
+encountered 117
+encountered 1594
+encountered 1595
+encountered 159
+encountered 1596
+encountered 38
+encountered 39
+encountered 1573
+encountered 117
+encountered 1598
+encountered 1599
+encountered 159
+census {15 => 2 38 => 5 39 => 3 117 => 3 159 => 3 1573 => 1 1574 => 1 1575 => 1 
+1584 => 1 1586 => 2 1588 => 2 1589 => 2 1590 => 1 1591 => 1 1592 => 1 
+1593 => 2 1594 => 1 1595 => 1 1596 => 1 1597 => 2 1598 => 1 1599 => 1 }, 
+>>>>> inliner
+encountered 1593
+encountered 1593
+encountered 1589
+encountered 1589
+encountered 1589
+encountered 1593
+encountered 1589
+encountered 1589
+encountered 1589
+encountered 1589
+encountered 1593
+encountered 1589
+encountered 1589
+encountered 1589
+encountered 1589
+encountered 1593
+encountered 1589
+encountered 1589
+encountered 1589
+encountered 1589
+encountered 1593
+encountered 1589
+encountered 1597
+encountered 1593
+encountered 1593
+encountered 1593
+encountered 1589
+encountered 1589
+encountered 1589
+encountered 1593
+encountered 1589
+encountered 1589
+encountered 1589
+encountered 1589
+encountered 1593
+encountered 1589
+encountered 1589
+encountered 1589
+encountered 1589
+encountered 1593
+encountered 1589
+encountered 1589
+encountered 1589
+encountered 1589
+encountered 1593
+encountered 1589
+encountered 1597
+encountered 1593
+encountered 1597
+encountered 1597
+encountered 1593
+encountered 1593
+encountered 1589
+encountered 1589
+encountered 1589
+encountered 1593
+encountered 1589
+encountered 1589
+encountered 1589
+encountered 1589
+encountered 1593
+encountered 1589
+encountered 1589
+encountered 1589
+encountered 1589
+encountered 1593
+encountered 1589
+encountered 1589
+encountered 1589
+encountered 1589
+encountered 1593
+encountered 1589
+encountered 1597
+encountered 1593
+encountered 1593
+encountered 1593
+encountered 1589
+encountered 1589
+encountered 1589
+encountered 1593
+encountered 1589
+encountered 1589
+encountered 1589
+encountered 1589
+encountered 1593
+encountered 1589
+encountered 1589
+encountered 1589
+encountered 1589
+encountered 1593
+encountered 1589
+encountered 1589
+encountered 1589
+encountered 1589
+encountered 1593
+encountered 1589
+encountered 1597
+encountered 1593
+encountered 1593
+encountered 1593
+encountered 1589
+encountered 1589
+encountered 1589
+encountered 1593
+encountered 1589
+encountered 1589
+encountered 1589
+encountered 1589
+encountered 1593
+encountered 1589
+encountered 1589
+encountered 1589
+encountered 1589
+encountered 1593
+encountered 1589
+encountered 1589
+encountered 1589
+encountered 1589
+encountered 1593
+encountered 1589
+encountered 1597
+encountered 1593
+encountered 1593
+encountered 1593
+encountered 1589
+encountered 1589
+encountered 1589
+encountered 1593
+encountered 1589
+encountered 1589
+encountered 1589
+encountered 1589
+encountered 1593
+encountered 1589
+encountered 1589
+encountered 1589
+encountered 1589
+encountered 1593
+encountered 1589
+encountered 1589
+encountered 1589
+encountered 1589
+encountered 1593
+encountered 1589
+encountered 1597
+encountered 1593
+encountered 1597
+encountered 1597
+encountered 1593
+encountered 1593
+encountered 1589
+encountered 1589
+encountered 1589
+encountered 1593
+encountered 1589
+encountered 1589
+encountered 1589
+encountered 1589
+encountered 1593
+encountered 1589
+encountered 1589
+encountered 1589
+encountered 1589
+encountered 1593
+encountered 1589
+encountered 1589
+encountered 1589
+encountered 1589
+encountered 1593
+encountered 1589
+encountered 1597
+encountered 1593
+encountered 1593
+encountered 1593
+encountered 1589
+encountered 1589
+encountered 1589
+encountered 1593
+encountered 1589
+encountered 1589
+encountered 1589
+encountered 1589
+encountered 1593
+encountered 1589
+encountered 1589
+encountered 1589
+encountered 1589
+encountered 1593
+encountered 1589
+encountered 1589
+encountered 1589
+encountered 1589
+encountered 1593
+encountered 1589
+encountered 1597
+encountered 1593
+census {1589 => 128 1593 => 56 1597 => 12 }, 
+inlined
+`Apply (`Primitive "concatMap",
+        [`Lambda ([1597],
+                  `Singleton `Apply (`Primitive "concatMap",
+                                     [`Lambda ([1593],
+                                               `If (`Apply (`Primitive "==",
+                                                            [`Project 
+                                                             ("a",
+                                                              `Variable 1597);
+                                                             `Project 
+                                                             ("a",
+                                                              `Variable 1593)]),
+                                                    `Singleton `Apply 
+                                                               (`Primitive "concatMap",
+                                                                [`Lambda 
+                                                                 ([1589],
+                                                                  `If 
+                                                                  (`Apply 
+                                                                   (`Primitive "==",
+                                                                    [`Project 
+                                                                    ("b",
+                                                                    `Variable 1593);
+                                                                    `Project 
+                                                                    ("b",
+                                                                    `Variable 1589)]),
+                                                                   `Singleton 
+                                                                   `Project 
+                                                                   ("v",
+                                                                    `Variable 1589),
+                                                                   Some
+                                                                    `Concat 
+                                                                    []));
+                                                                 `Table 
+                                                                 ((...,
+                                                                   "postgresql:nested1:localhost:5432:stefan:links"),
+                                                                  "t3",
+                                                                  [["b"; "v"]],
+                                                                  ({"b" => 
+                                                                    (`Present,
+                                                                    `Primitive `Int) 
+                                                                   "v" => 
+                                                                   (`Present,
+                                                                    `Primitive `Int) }, ,
+                                                                   ...))]),
+                                                    Some `Concat []));
+                                      `Table ((...,
+                                               "postgresql:nested1:localhost:5432:stefan:links"),
+                                              "t2", [["a"; "b"]],
+                                              ({"a" => (`Present,
+                                                        `Primitive `Int) 
+                                               "b" => (`Present,
+                                                       `Primitive `Int) }, ,
+                                               ...))]));
+         `Table ((..., "postgresql:nested1:localhost:5432:stefan:links"),
+                 "t1", [["v"; "a"]],
+                 ({"a" => (`Present, `Primitive `Int) "v" => (`Present,
+                                                              `Primitive `Int) }, ,
+                  ...))])
+>>>>> boxed
+`Apply ((`Primitive "concatMap",
+         [`Lambda (([1597],
+                    `Singleton (`Box (`Apply ((`Primitive "concatMap",
+                                               [`Lambda (([1593],
+                                                          `If ((`Apply 
+                                                                ((`Primitive "==",
+                                                                  [`Project 
+                                                                   (("a",
+                                                                    `Variable 
+                                                                    (1597,
+                                                                    `Atom)),
+                                                                    `Atom);
+                                                                   `Project 
+                                                                   (("a",
+                                                                    `Variable 
+                                                                    (1593,
+                                                                    `Atom)),
+                                                                    `Atom)]),
+                                                                 `Atom),
+                                                                `Singleton 
+                                                                (`Box 
+                                                                 (`Apply 
+                                                                  ((`Primitive "concatMap",
+                                                                    [`Lambda 
+                                                                    (([1589],
+                                                                    `If 
+                                                                    ((`Apply 
+                                                                    ((`Primitive "==",
+                                                                    [`Project 
+                                                                    (("b",
+                                                                    `Variable 
+                                                                    (1593,
+                                                                    `Atom)),
+                                                                    `Atom);
+                                                                    `Project 
+                                                                    (("b",
+                                                                    `Variable 
+                                                                    (1589,
+                                                                    `Atom)),
+                                                                    `Atom)]),
+                                                                    `Atom),
+                                                                    `Singleton 
+                                                                    (`Project 
+                                                                    (("v",
+                                                                    `Variable 
+                                                                    (1589,
+                                                                    `Atom)),
+                                                                    `Atom),
+                                                                    `List),
+                                                                    Some
+                                                                    `Concat 
+                                                                    ([],
+                                                                    `List)),
+                                                                    `List)),
+                                                                    `List);
+                                                                    `Table 
+                                                                    (((...,
+                                                                    "postgresql:nested1:localhost:5432:stefan:links"),
+                                                                    "t3",
+                                                                    [["b";
+                                                                    "v"]],
+                                                                    ({
+                                                                    "b" => 
+                                                                    (`Present,
+                                                                    `Primitive `Int) 
+                                                                    "v" => 
+                                                                    (`Present,
+                                                                    `Primitive `Int) }, ,
+                                                                    ...)),
+                                                                    `List)]),
+                                                                   `List),
+                                                                  `Atom),
+                                                                 `List),
+                                                                Some
+                                                                  `Concat 
+                                                                  ([], `List)),
+                                                               `List)),
+                                                         `List);
+                                                `Table (((...,
+                                                          "postgresql:nested1:localhost:5432:stefan:links"),
+                                                         "t2", [["a"; "b"]],
+                                                         ({"a" => (`Present,
+                                                                   `Primitive `Int) 
+                                                          "b" => (`Present,
+                                                                  `Primitive `Int) }, ,
+                                                          ...)), `List)]),
+                                              `List), `Atom), `List)), `List);
+          `Table (((..., "postgresql:nested1:localhost:5432:stefan:links"),
+                   "t1", [["v"; "a"]],
+                   ({"a" => (`Present, `Primitive `Int) "v" => (`Present,
+                                                                `Primitive `Int) }, ,
+                    ...)), `List)]), `List)
+Qr.pipeline time: 2
+not triggered antijoin rewrite for `Lambda (([1597],
+          `Singleton (`Box (`Apply ((`Primitive "concatMap",
+                                     [`Lambda (([1593],
+                                                `If ((`Apply ((`Primitive "==",
+                                                               [`Project 
+                                                                (("a",
+                                                                  `Variable 
+                                                                  (1597,
+                                                                   `Atom)),
+                                                                 `Atom);
+                                                                `Project 
+                                                                (("a",
+                                                                  `Variable 
+                                                                  (1593,
+                                                                   `Atom)),
+                                                                 `Atom)]),
+                                                              `Atom),
+                                                      `Singleton (`Box 
+                                                                  (`Apply 
+                                                                   ((`Primitive "concatMap",
+                                                                    [`Lambda 
+                                                                    (([1589],
+                                                                    `If 
+                                                                    ((`Apply 
+                                                                    ((`Primitive "==",
+                                                                    [`Project 
+                                                                    (("b",
+                                                                    `Variable 
+                                                                    (1593,
+                                                                    `Atom)),
+                                                                    `Atom);
+                                                                    `Project 
+                                                                    (("b",
+                                                                    `Variable 
+                                                                    (1589,
+                                                                    `Atom)),
+                                                                    `Atom)]),
+                                                                    `Atom),
+                                                                    `Singleton 
+                                                                    (`Project 
+                                                                    (("v",
+                                                                    `Variable 
+                                                                    (1589,
+                                                                    `Atom)),
+                                                                    `Atom),
+                                                                    `List),
+                                                                    Some
+                                                                    `Concat 
+                                                                    ([],
+                                                                    `List)),
+                                                                    `List)),
+                                                                    `List);
+                                                                    `Table 
+                                                                    (((...,
+                                                                    "postgresql:nested1:localhost:5432:stefan:links"),
+                                                                    "t3",
+                                                                    [["b";
+                                                                    "v"]],
+                                                                    ({
+                                                                    "b" => 
+                                                                    (`Present,
+                                                                    `Primitive `Int) 
+                                                                    "v" => 
+                                                                    (`Present,
+                                                                    `Primitive `Int) }, ,
+                                                                    ...)),
+                                                                    `List)]),
+                                                                    `List),
+                                                                   `Atom),
+                                                                  `List),
+                                                      Some
+                                                        `Concat ([], `List)),
+                                                     `List)), `List);
+                                      `Table (((...,
+                                                "postgresql:nested1:localhost:5432:stefan:links"),
+                                               "t2", [["a"; "b"]],
+                                               ({"a" => (`Present,
+                                                         `Primitive `Int) 
+                                                "b" => (`Present,
+                                                        `Primitive `Int) }, ,
+                                                ...)), `List)]), `List),
+                            `Atom), `List)), `List)
+triggering antijoin rewrite
+triggering antijoin rewrite
+QrToAlgebra.compile time: 0
+>>>> pfopt 0
+>>>> pfsql 0
+>>>> Executing query
+
+SELECT 1 AS iter4_nat,
+        ROW_NUMBER () OVER (ORDER BY a0000.v ASC, a0000.a ASC) AS iter3_nat
+   FROM t1 AS a0000
+  ORDER BY a0000.v ASC, a0000.a ASC;
+
+>>>> pfopt 1
+>>>> pfsql 1
+>>>> Executing query
+
+WITH
+-- binding due to rank operator
+t0000 (item1_int, item2_int, iter3_nat) AS
+  (SELECT a0000.a AS item1_int, a0000.v AS item2_int,
+          DENSE_RANK () OVER (ORDER BY a0000.v ASC, a0000.a ASC) AS iter3_nat
+     FROM t1 AS a0000),
+
+-- binding due to rownum operator
+t0001 (item1_int, iter3_nat, item4_int, item5_int, iter14_nat) AS
+  (SELECT a0001.item1_int, a0001.iter3_nat, a0002.a AS item4_int,
+          a0002.b AS item5_int,
+          ROW_NUMBER () OVER
+          (ORDER BY a0001.iter3_nat ASC, a0002.a ASC, a0002.b ASC) AS iter14_nat
+     FROM t0000 AS a0001,
+          t2 AS a0002)
+
+SELECT a0003.iter14_nat AS iter9_nat, a0003.iter3_nat
+   FROM t0001 AS a0003,
+        t0000 AS a0004
+  WHERE a0003.iter3_nat = a0004.iter3_nat
+    AND a0004.item1_int = a0003.item4_int
+  ORDER BY a0003.iter3_nat ASC, a0003.iter14_nat ASC;
+
+>>>> pfopt 2
+>>>> pfsql 2
+>>>> Executing query
+
+WITH
+-- binding due to rank operator
+t0000 (item3_int, item4_int, item1_int, item2_int, iter30_nat) AS
+  (SELECT a0001.a AS item3_int, a0001.v AS item4_int, a0002.a AS item1_int,
+          a0002.b AS item2_int,
+          DENSE_RANK () OVER
+          (ORDER BY a0001.v ASC, a0001.a ASC, a0002.a ASC, a0002.b ASC) AS
+          iter30_nat
+     FROM t1 AS a0001,
+          t2 AS a0002)
+
+SELECT a0003.iter30_nat AS iter24_nat, a0000.v AS item23_int
+   FROM t3 AS a0000,
+        t0000 AS a0003,
+        t0000 AS a0004,
+        t0000 AS a0005,
+        t0000 AS a0006,
+        t0000 AS a0007
+  WHERE a0003.iter30_nat = a0004.iter30_nat
+    AND a0003.iter30_nat = a0005.iter30_nat
+    AND a0006.iter30_nat = a0007.iter30_nat
+    AND a0003.iter30_nat = a0006.iter30_nat
+    AND a0006.item3_int = a0007.item1_int
+    AND a0003.item3_int = a0004.item1_int
+    AND a0000.b = a0005.item2_int
+  ORDER BY a0003.iter30_nat ASC, a0003.iter30_nat ASC, a0000.b ASC, a0000.v ASC;
+
+execute_queries time: 48
+value_from_table time: 2
+[[[97528, 103509, 121806, 306791, 350041, 375204, 855170, 942065, 965111, 973525], [130886, 420404, 480298, 554881, 605157, 629317, 667712, 764164, 880623, 993499], [90359, 116469, 166331, 379666, 393359, 401441, 476239, 906385, 907288, 988260], [121815, 221309, 275762, 276372, 296506, 460713, 465995, 666788, 735548, 819370], [126337, 225171, 312780, 469833, 500838, 501553, 598675, 624851, 745024, 816039], [76994, 296104, 313931, 354395, 525787, 528068, 614830, 701977, 710345, 982611], [29439, 137383, 398112, 432958, 433421, 530101, 670127, 857441, 863199, 988344], [13502, 31855, 193522, 305813, 559163, 672366, 825113, 913842, 968073, 974475], [12496, 24165, 100228, 284810, 663731, 717629, 783033, 823971, 862954, 983765], [149039, 158856, 162112, 198770, 265689, 360502, 767063, 882565, 890276, 950525]], [[11171, 105440, 148607, 249382, 302970, 585416, 742557, 780400, 956656, 994378], [140820, 205881, 295797, 337780, 404666, 476712, 694373, 720903, 751388, 999114], [353569, 572945, 625833, 638766, 651976, 734754, 748097, 756010, 891884, 983427], [9002, 42893, 75885, 115379, 267768, 298293, 531854, 786674, 882109, 998510], [75706, 111308, 216246, 378621, 490907, 495333, 505413, 575485, 579671, 719402], [49297, 134674, 364227, 483118, 556376, 570124, 705461, 831167, 951617, 979841], [65960, 93355, 162393, 377089, 461012, 486902, 795264, 815232, 854032, 877064], [3239, 71174, 154962, 709520, 736854, 745687, 785159, 793602, 923766, 948021], [155343, 251606, 324526, 336911, 496409, 525181, 601209, 662728, 716791, 842917], [11413, 16441, 235770, 254420, 272375, 308066, 351332, 403790, 895550, 988862]], [[387531, 630727, 634941, 635027, 694195, 786907, 850437, 894140, 912240, 917958], [184706, 199014, 301522, 325806, 407482, 479938, 555389, 804404, 826686, 961029], [21735, 61286, 75221, 249418, 277803, 366502, 560748, 688476, 793987, 992779], [8653, 27251, 115448, 407738, 433691, 447252, 458294, 501487, 939431, 963490], [51373, 118068, 410339, 412722, 422153, 469648, 477336, 646795, 767220, 891436], [103578, 192880, 226719, 251053, 450847, 567488, 699055, 844322, 876735, 890467], [165252, 463016, 488436, 549602, 598781, 782401, 907532, 928011, 942265, 948977], [21099, 396529, 398847, 470305, 579244, 646047, 705244, 768199, 948577, 967307], [105393, 150187, 294189, 302958, 415798, 460933, 628091, 785216, 870090, 953424], [43634, 56435, 373363, 426735, 587029, 590850, 645943, 751763, 830799, 843082]], [[95687, 274249, 284957, 325424, 448605, 464964, 772152, 847184, 953661, 954536], [60891, 188842, 230639, 240966, 333317, 374901, 450605, 663507, 916743, 995841], [65159, 76944, 84372, 234529, 251335, 531938, 631894, 648391, 844832, 879361], [15013, 54844, 103635, 399087, 581895, 646722, 683228, 790889, 920270, 943608], [247385, 256575, 292633, 420083, 440920, 620265, 698888, 813047, 887784, 975907], [153264, 194648, 288121, 319682, 412101, 680202, 822500, 840169, 858596, 929067], [69032, 87115, 195114, 235235, 253497, 260714, 285317, 309242, 434351, 880560], [26721, 118456, 211097, 319856, 432565, 516495, 581946, 604972, 634864, 849215], [21588, 110546, 209996, 250097, 262460, 329212, 384465, 437739, 781565, 920670], [51693, 179616, 344611, 557830, 560318, 570249, 678637, 766251, 877237, 913511]], [[277558, 306649, 396008, 447952, 480032, 516363, 637155, 713369, 754441, 882042], [312299, 446195, 471753, 518324, 561942, 700407, 752205, 795974, 898904, 956927], [2298, 209941, 468202, 494547, 532145, 577009, 896093, 909009, 969734, 971925], [342980, 399856, 423169, 445605, 586672, 594641, 659440, 710076, 718065, 921662], [4464, 40981, 166709, 435674, 455573, 509824, 689453, 794230, 831337, 988371], [143261, 230777, 258134, 333064, 646815, 667318, 711872, 808738, 903166, 926032], [17239, 95913, 178289, 230675, 260902, 431896, 566833, 601713, 920308, 976336], [177520, 179989, 186900, 374036, 444387, 525012, 583671, 634559, 839053, 843616], [90356, 133093, 369157, 438957, 557243, 641081, 755215, 815115, 831004, 960098], [107816, 166389, 245923, 308823, 420296, 623088, 642195, 691016, 718433, 977140]], [[90681, 171050, 288156, 369123, 388806, 426890, 718011, 758688, 821012, 894769], [54967, 103361, 155658, 174854, 761422, 861561, 905162, 926939, 952007, 999699], [140217, 345511, 507556, 507718, 550752, 644556, 732917, 752529, 847973, 884268], [64678, 143863, 190866, 227432, 428284, 483609, 489748, 497132, 525608, 602709], [4887, 46623, 313112, 454289, 528100, 536100, 577201, 777267, 921790, 942916], [134739, 252145, 324996, 456581, 476569, 498898, 633924, 683478, 818080, 925170], [28998, 188312, 204820, 350606, 413232, 435676, 580527, 615931, 631743, 839341], [8112, 38084, 114912, 178990, 343291, 481818, 659407, 672204, 896981, 979109], [95008, 106476, 439476, 464980, 763433, 840696, 894330, 917503, 918038, 991965], [198523, 270193, 407394, 410423, 444121, 457515, 590324, 713174, 750148, 757392]], [[193975, 250176, 404687, 543402, 583261, 782722, 791691, 858299, 958245, 961938], [111247, 175506, 196502, 412615, 456785, 502169, 586909, 742123, 877690, 944753], [296635, 586430, 590467, 722024, 749436, 776598, 782340, 883222, 942028, 951332], [178797, 216204, 332952, 565336, 594734, 685045, 763991, 855518, 856513, 908211], [38680, 197839, 356697, 363089, 527773, 756926, 807009, 817398, 900649, 909621], [40085, 104379, 128570, 217967, 230911, 298777, 361680, 594329, 859168, 983451], [147810, 193068, 253566, 262594, 404255, 437153, 605007, 624297, 773794, 804979], [21141, 22205, 154360, 452301, 486926, 682207, 917293, 950548, 966836, 973341], [1220, 64175, 158793, 296714, 303373, 524604, 628280, 653196, 701442, 788770], [301391, 359466, 376132, 418308, 691457, 728046, 835941, 867828, 893128, 984906]], [[124626, 188834, 253902, 273880, 279594, 316899, 642253, 689885, 819708, 822631], [24122, 63464, 150109, 312355, 396799, 635491, 749943, 787299, 986719, 991446], [43954, 245082, 318220, 326713, 326730, 328744, 345554, 423957, 682937, 948398], [23081, 64572, 95817, 147176, 451461, 610851, 623305, 701020, 969850, 994032], [66155, 111895, 174188, 290013, 525749, 542717, 688092, 831272, 837322, 884499], [13440, 380112, 544816, 573546, 580300, 612545, 675846, 676991, 691874, 857498], [20075, 245883, 286097, 308325, 345598, 457049, 496081, 568316, 714986, 764027], [16536, 158153, 178258, 376758, 658322, 671049, 725624, 742155, 792162, 970293], [48449, 68420, 73242, 100660, 402123, 613116, 615702, 713223, 753052, 859527], [201642, 325351, 408188, 422331, 712910, 746712, 803812, 814269, 931456, 947963]], [[41604, 118972, 220437, 277235, 339772, 437246, 651654, 760109, 845755, 903402], [3305, 244607, 334636, 407339, 450185, 465365, 498077, 612689, 751085, 869800], [24735, 35541, 205289, 272707, 317625, 625710, 759393, 803827, 881463, 929129], [60591, 121788, 161790, 270160, 270341, 308942, 465249, 809328, 870265, 893915], [84328, 166208, 261141, 285987, 295756, 411362, 581114, 619488, 632953, 697744], [125585, 137096, 211905, 424970, 449975, 653684, 696021, 716565, 766580, 940592], [22698, 351272, 384216, 497718, 578598, 592341, 658929, 857663, 901175, 961278], [31597, 98264, 102383, 168068, 181891, 319298, 454611, 595832, 669800, 679674], [16177, 159128, 363077, 369483, 501308, 558700, 564793, 647746, 703803, 722418], [41786, 57831, 291362, 382241, 557874, 755580, 780483, 820364, 891908, 970295]], [[125595, 283924, 309869, 429372, 490555, 575633, 576781, 790182, 962435, 986062], [124185, 148996, 411556, 448070, 523070, 548534, 575329, 659928, 720536, 971735], [226481, 307430, 408468, 559794, 615726, 780118, 875560, 881365, 936010, 947850], [134950, 393134, 409087, 439680, 501764, 673017, 696154, 707475, 725780, 848013], [81845, 115655, 160334, 160639, 180834, 187870, 352413, 523961, 686774, 722846], [57746, 258837, 420772, 440141, 473161, 613753, 632307, 667369, 805173, 865713], [51247, 55846, 246462, 394664, 405293, 444295, 537536, 653563, 804925, 953430], [17111, 19049, 98770, 134966, 355870, 445702, 543636, 671138, 733156, 914468], [88534, 166594, 353318, 361998, 379000, 467222, 542681, 645589, 697249, 869839], [53127, 84802, 229729, 293961, 463809, 512450, 606056, 626604, 698324, 985215]]] : [[[Int]]]
+
+real    0m0.072s
+user    0m0.050s
+sys     0m0.003s
+* Nested2

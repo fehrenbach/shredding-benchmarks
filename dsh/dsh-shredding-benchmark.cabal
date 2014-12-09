@@ -1,0 +1,10 @@
+name:                  dsh-shredding-benchmark
+version:               0.1.0.0
+build-type:            Simple
+cabal-version:         >=1.18
+ 
+executable dsh-shredding-benchmark
+  main-is:             Main.hs
+  build-depends:       base
+                     , DSH == 0.8.2.3
+                     , HDBC-postgresql == 2.3.2.2
