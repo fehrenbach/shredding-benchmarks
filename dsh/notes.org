@@ -837,3 +837,1531 @@ real    0m0.072s
 user    0m0.050s
 sys     0m0.003s
 * Nested2
+** DSH
+*** Raw
+<query_plan_bundle>
+  <query_plan id="0">
+    <properties>
+      <property name="cs">
+        <property name="offset" value="1">
+          <property name="type" value="nat"/>
+        </property>
+      </property>
+      <property name="overallResultType" value="LIST"/>
+    </properties>
+    <schema>
+      <column name="iter10" function="iter"/>
+      <column name="item7" new="false" function="item" position="0"/>
+    </schema>
+    <query><![CDATA[
+WITH
+-- binding due to set operation
+t0000 (pos5_int, item6_nat) AS
+  ((SELECT a0000.a AS pos5_int, 1 AS item6_nat
+      FROM t1 AS a0000)
+   UNION ALL
+   (SELECT a0001.a AS pos5_int, 2 AS item6_nat
+      FROM t1 AS a0001)),
+
+-- binding due to rownum operator
+t0001 (pos5_int, item6_nat, item7_nat) AS
+  (SELECT a0002.pos5_int, a0002.item6_nat,
+          ROW_NUMBER () OVER (ORDER BY a0002.item6_nat ASC, a0002.pos5_int ASC)
+          AS item7_nat
+     FROM t0000 AS a0002)
+
+SELECT 1 AS iter10_nat, a0003.item7_nat
+   FROM t0001 AS a0003,
+        (VALUES (1),
+               (2)) AS a0004(item12_nat)
+  WHERE a0003.item6_nat = a0004.item12_nat
+  ORDER BY a0003.item6_nat ASC, a0003.pos5_int ASC;
+]]></query>
+  </query_plan>
+  <query_plan id="1" idref="0" colref="1">
+    <properties>
+      <property name="cs">
+        <property name="offset" value="1">
+          <property name="type" value="nat"/>
+        </property>
+      </property>
+    </properties>
+    <schema>
+      <column name="item29" function="iter"/>
+      <column name="item22" new="false" function="item" position="0"/>
+    </schema>
+    <query><![CDATA[
+WITH
+-- binding due to rownum operator
+t0000 (item5_int, item6_nat) AS
+  (SELECT a0000.a AS item5_int,
+          ROW_NUMBER () OVER (ORDER BY a0000.a ASC) AS item6_nat
+     FROM t1 AS a0000),
+
+-- binding due to set operation
+t0001 (item26_nat, item27_nat, pos28_int) AS
+  ((SELECT a0001.item6_nat AS item26_nat, 1 AS item27_nat,
+           a0001.item5_int AS pos28_int
+      FROM t0000 AS a0001)
+   UNION ALL
+   (SELECT a0002.item6_nat AS item26_nat, 2 AS item27_nat,
+           a0002.item5_int AS pos28_int
+      FROM t0000 AS a0002)),
+
+-- binding due to rownum operator
+t0002 (item26_nat, item27_nat, pos28_int, item29_nat) AS
+  (SELECT a0003.item26_nat, a0003.item27_nat, a0003.pos28_int,
+          ROW_NUMBER () OVER
+          (ORDER BY a0003.item27_nat ASC, a0003.pos28_int ASC) AS item29_nat
+     FROM t0001 AS a0003),
+
+-- binding due to rank operator
+t0003 (iter19_nat, item20_nat, item38_int, item39_int, pos21_nat) AS
+  (SELECT a0006.item6_nat AS iter19_nat, 1 AS item20_nat, a0007.a AS item38_int,
+          a0007.b AS item39_int,
+          DENSE_RANK () OVER (ORDER BY a0007.a ASC, a0007.b ASC) AS pos21_nat
+     FROM t0000 AS a0006,
+          t2 AS a0007
+    WHERE a0006.item5_int = a0007.a),
+
+-- binding due to rank operator
+t0004 (iter19_nat, item20_nat, item40_int, item41_int, pos21_nat) AS
+  (SELECT a0009.item6_nat AS iter19_nat, 2 AS item20_nat, a0010.a AS item40_int,
+          a0010.b AS item41_int,
+          DENSE_RANK () OVER (ORDER BY a0010.a ASC, a0010.b ASC) AS pos21_nat
+     FROM t0000 AS a0009,
+          t2 AS a0010
+    WHERE a0009.item5_int = a0010.a),
+
+-- binding due to set operation
+t0005 (iter19_nat, item20_nat, pos21_nat) AS
+  ((SELECT a0008.iter19_nat, a0008.item20_nat, a0008.pos21_nat
+      FROM t0003 AS a0008)
+   UNION ALL
+   (SELECT a0011.iter19_nat, a0011.item20_nat, a0011.pos21_nat
+      FROM t0004 AS a0011)),
+
+-- binding due to rownum operator
+t0006 (iter19_nat, item20_nat, pos21_nat, item22_nat) AS
+  (SELECT a0012.iter19_nat, a0012.item20_nat, a0012.pos21_nat,
+          ROW_NUMBER () OVER
+          (ORDER BY a0012.iter19_nat ASC, a0012.item20_nat ASC, a0012.pos21_nat
+           ASC) AS item22_nat
+     FROM t0005 AS a0012)
+
+SELECT a0013.item22_nat, a0004.item29_nat
+   FROM t0002 AS a0004,
+        (VALUES (1),
+               (2)) AS a0005(item35_nat),
+        t0006 AS a0013
+  WHERE a0004.item27_nat = a0005.item35_nat
+    AND a0004.item27_nat = a0013.item20_nat
+    AND a0004.item26_nat = a0013.iter19_nat
+  ORDER BY a0004.item29_nat ASC, a0013.pos21_nat ASC;
+]]></query>
+  </query_plan>
+  <query_plan id="2" idref="1" colref="1">
+    <properties>
+      <property name="cs">
+        <property name="offset" value="1">
+          <property name="type" value="int"/>
+        </property>
+      </property>
+    </properties>
+    <schema>
+      <column name="item42" function="iter"/>
+      <column name="item31" new="false" function="item" position="0"/>
+    </schema>
+    <query><![CDATA[
+WITH
+-- binding due to rownum operator
+t0000 (item7_int, item8_nat) AS
+  (SELECT a0000.a AS item7_int,
+          ROW_NUMBER () OVER (ORDER BY a0000.a ASC) AS item8_nat
+     FROM t1 AS a0000),
+
+-- binding due to set operation
+t0001 (item46_nat, item47_nat) AS
+  ((SELECT a0001.item8_nat AS item46_nat, 1 AS item47_nat
+      FROM t0000 AS a0001)
+   UNION ALL
+   (SELECT a0002.item8_nat AS item46_nat, 2 AS item47_nat
+      FROM t0000 AS a0002)),
+
+-- binding due to rownum operator
+t0002 (item7_int, item8_nat, item5_int, item6_int, item59_nat) AS
+  (SELECT a0005.item7_int, a0005.item8_nat, a0006.a AS item5_int,
+          a0006.b AS item6_int,
+          ROW_NUMBER () OVER
+          (ORDER BY a0005.item8_nat ASC, a0006.a ASC, a0006.b ASC) AS item59_nat
+     FROM t0000 AS a0005,
+          t2 AS a0006
+    WHERE a0005.item7_int = a0006.a),
+
+-- binding due to rank operator
+t0003 (iter38_nat, item39_nat, item40_nat, item66_int, item67_int,
+  pos41_nat) AS
+  (SELECT a0007.item8_nat AS iter38_nat, a0007.item59_nat AS item39_nat,
+          1 AS item40_nat, a0007.item5_int AS item66_int,
+          a0007.item6_int AS item67_int,
+          DENSE_RANK () OVER (ORDER BY a0007.item5_int ASC, a0007.item6_int ASC)
+          AS pos41_nat
+     FROM t0002 AS a0007),
+
+-- binding due to rank operator
+t0004 (iter38_nat, item39_nat, item40_nat, item68_int, item69_int,
+  pos41_nat) AS
+  (SELECT a0009.item8_nat AS iter38_nat, a0009.item59_nat AS item39_nat,
+          2 AS item40_nat, a0009.item5_int AS item68_int,
+          a0009.item6_int AS item69_int,
+          DENSE_RANK () OVER (ORDER BY a0009.item5_int ASC, a0009.item6_int ASC)
+          AS pos41_nat
+     FROM t0002 AS a0009),
+
+-- binding due to set operation
+t0005 (iter38_nat, item39_nat, item40_nat, pos41_nat) AS
+  ((SELECT a0008.iter38_nat, a0008.item39_nat, a0008.item40_nat, a0008.pos41_nat
+      FROM t0003 AS a0008)
+   UNION ALL
+   (SELECT a0010.iter38_nat, a0010.item39_nat, a0010.item40_nat, a0010.pos41_nat
+      FROM t0004 AS a0010)),
+
+-- binding due to rownum operator
+t0006 (iter38_nat, item39_nat, item40_nat, pos41_nat, item42_nat) AS
+  (SELECT a0011.iter38_nat, a0011.item39_nat, a0011.item40_nat, a0011.pos41_nat,
+          ROW_NUMBER () OVER
+          (ORDER BY a0011.iter38_nat ASC, a0011.item40_nat ASC, a0011.pos41_nat
+           ASC) AS item42_nat
+     FROM t0005 AS a0011),
+
+-- binding due to rank operator
+t0007 (iter30_nat, item31_int, item32_nat, item70_int, pos33_nat) AS
+  (SELECT a0013.item59_nat AS iter30_nat, a0014.v AS item31_int,
+          1 AS item32_nat, a0014.b AS item70_int,
+          DENSE_RANK () OVER (ORDER BY a0014.b ASC, a0014.v ASC) AS pos33_nat
+     FROM t0002 AS a0013,
+          t3 AS a0014
+    WHERE a0013.item6_int = a0014.b),
+
+-- binding due to rank operator
+t0008 (iter30_nat, item31_int, item32_nat, item71_int, pos33_nat) AS
+  (SELECT a0016.item59_nat AS iter30_nat, a0017.v AS item31_int,
+          2 AS item32_nat, a0017.b AS item71_int,
+          DENSE_RANK () OVER (ORDER BY a0017.b ASC, a0017.v ASC) AS pos33_nat
+     FROM t0002 AS a0016,
+          t4 AS a0017
+    WHERE a0016.item6_int = a0017.b),
+
+-- binding due to set operation
+t0009 (iter30_nat, item31_int, item32_nat, pos33_nat) AS
+  ((SELECT a0015.iter30_nat, a0015.item31_int, a0015.item32_nat, a0015.pos33_nat
+      FROM t0007 AS a0015)
+   UNION ALL
+   (SELECT a0018.iter30_nat, a0018.item31_int, a0018.item32_nat, a0018.pos33_nat
+      FROM t0008 AS a0018))
+
+SELECT a0019.item31_int, a0012.item42_nat
+   FROM t0001 AS a0003,
+        (VALUES (1),
+               (2)) AS a0004(item56_nat),
+        t0006 AS a0012,
+        t0009 AS a0019
+  WHERE a0003.item47_nat = a0004.item56_nat
+    AND a0003.item47_nat = a0012.item40_nat
+    AND a0003.item47_nat = a0019.item32_nat
+    AND a0003.item46_nat = a0012.iter38_nat
+    AND a0012.item39_nat = a0019.iter30_nat
+  ORDER BY a0012.item42_nat ASC, a0019.pos33_nat ASC;
+]]></query>
+  </query_plan>
+</query_plan_bundle>
+
+nevermind, the result is way too large
+
+real    0m0.533s
+user    0m0.380s
+sys     0m0.013s
+** Sand
+*** Raw
+stefan@stefan-work:~/src/links.shredding/benchmarks (detached from 275c880)$ time ~/src/links.sand/links --config=config nested2-sand.links 
+Reusing prelude.links.cache
+Reusing nested2-sand.links.cache
+remaining freevars {}
+primitive_free_vars {15, 38, 39, 117}
+>>>>> before
+`Let ([(117, `Primitive "AsList"); (39, `Primitive "Cons"); (38, `Concat []);
+       (15, `Primitive "==");
+       (1575,
+        `Table ((..., "postgresql:nested2:localhost:5432:stefan:links"),
+                "t3", [["b"; "v"]],
+                ({"b" => (`Present, `Primitive `Int) "v" => (`Present,
+                                                             `Primitive `Int) }, ,
+                 ...)));
+       (1574,
+        `Table ((..., "postgresql:nested2:localhost:5432:stefan:links"),
+                "t2", [["a"; "b"]],
+                ({"a" => (`Present, `Primitive `Int) "b" => (`Present,
+                                                             `Primitive `Int) }, ,
+                 ...)));
+       (1573,
+        `Table ((..., "postgresql:nested2:localhost:5432:stefan:links"),
+                "t1", [["a"]],
+                ({"a" => (`Present, `Primitive `Int) }, , ...)));
+       (159, `Primitive "concatMap");
+       (1617,
+        `Lambda ([1616],
+                 `Let ([(1602, `Variable 1616); (1603, `Variable 1616);
+                        (1615,
+                         `Let ([(1613,
+                                 `Lambda ([1612],
+                                          `Let ([(1604, `Variable 1612);
+                                                 (1605, `Variable 1612)],
+                                                `If (`Apply (`Variable 15,
+                                                             [`Project 
+                                                              ("a",
+                                                               `Variable 1603);
+                                                              `Project 
+                                                              ("a",
+                                                               `Variable 1605)]),
+                                                     `Let ([(1611,
+                                                             `Let ([(1609,
+                                                                    `Lambda 
+                                                                    ([1608],
+                                                                    `Let 
+                                                                    ([(1606,
+                                                                    `Variable 1608);
+                                                                    (1607,
+                                                                    `Variable 1608)],
+                                                                    `If 
+                                                                    (`Apply 
+                                                                    (`Variable 15,
+                                                                    [`Project 
+                                                                    ("b",
+                                                                    `Variable 1605);
+                                                                    `Project 
+                                                                    ("b",
+                                                                    `Variable 1607)]),
+                                                                    `Let 
+                                                                    ([],
+                                                                    `Apply 
+                                                                    (`Variable 39,
+                                                                    [`Project 
+                                                                    ("v",
+                                                                    `Variable 1607);
+                                                                    `Variable 38])),
+                                                                    Some
+                                                                    `Let 
+                                                                    ([],
+                                                                    `Variable 38)))));
+                                                                    (1610,
+                                                                    `Apply 
+                                                                    (`Variable 117,
+                                                                    [`Variable 1575]))],
+                                                                   `Apply 
+                                                                   (`Variable 159,
+                                                                    [`Variable 1609;
+                                                                    `Variable 1610])))],
+                                                           `Apply (`Variable 39,
+                                                                   [`Variable 1611;
+                                                                    `Variable 38])),
+                                                     Some
+                                                       `Let ([],
+                                                             `Variable 38)))));
+                                (1614,
+                                 `Apply (`Variable 117, [`Variable 1574]))],
+                               `Apply (`Variable 159,
+                                       [`Variable 1613; `Variable 1614])))],
+                       `Apply (`Variable 39, [`Variable 1615; `Variable 38]))));
+       (1618, `Apply (`Variable 117, [`Variable 1573]))],
+      `Apply (`Variable 159, [`Variable 1617; `Variable 1618]))
+encountered 1616
+encountered 1616
+encountered 1612
+encountered 1612
+encountered 38
+encountered 1608
+encountered 1608
+encountered 38
+encountered 1607
+encountered 38
+encountered 39
+encountered 1605
+encountered 1607
+encountered 15
+encountered 1575
+encountered 117
+encountered 1609
+encountered 1610
+encountered 159
+encountered 1611
+encountered 38
+encountered 39
+encountered 1603
+encountered 1605
+encountered 15
+encountered 1574
+encountered 117
+encountered 1613
+encountered 1614
+encountered 159
+encountered 1615
+encountered 38
+encountered 39
+encountered 1573
+encountered 117
+encountered 1617
+encountered 1618
+encountered 159
+census {15 => 2 38 => 5 39 => 3 117 => 3 159 => 3 1573 => 1 1574 => 1 1575 => 1 
+1603 => 1 1605 => 2 1607 => 2 1608 => 2 1609 => 1 1610 => 1 1611 => 1 
+1612 => 2 1613 => 1 1614 => 1 1615 => 1 1616 => 2 1617 => 1 1618 => 1 }, 
+>>>>> inliner
+encountered 1612
+encountered 1612
+encountered 1608
+encountered 1608
+encountered 1608
+encountered 1612
+encountered 1608
+encountered 1608
+encountered 1608
+encountered 1608
+encountered 1612
+encountered 1608
+encountered 1608
+encountered 1608
+encountered 1608
+encountered 1612
+encountered 1608
+encountered 1608
+encountered 1608
+encountered 1608
+encountered 1612
+encountered 1608
+encountered 1616
+encountered 1612
+encountered 1612
+encountered 1612
+encountered 1608
+encountered 1608
+encountered 1608
+encountered 1612
+encountered 1608
+encountered 1608
+encountered 1608
+encountered 1608
+encountered 1612
+encountered 1608
+encountered 1608
+encountered 1608
+encountered 1608
+encountered 1612
+encountered 1608
+encountered 1608
+encountered 1608
+encountered 1608
+encountered 1612
+encountered 1608
+encountered 1616
+encountered 1612
+encountered 1616
+encountered 1616
+encountered 1612
+encountered 1612
+encountered 1608
+encountered 1608
+encountered 1608
+encountered 1612
+encountered 1608
+encountered 1608
+encountered 1608
+encountered 1608
+encountered 1612
+encountered 1608
+encountered 1608
+encountered 1608
+encountered 1608
+encountered 1612
+encountered 1608
+encountered 1608
+encountered 1608
+encountered 1608
+encountered 1612
+encountered 1608
+encountered 1616
+encountered 1612
+encountered 1612
+encountered 1612
+encountered 1608
+encountered 1608
+encountered 1608
+encountered 1612
+encountered 1608
+encountered 1608
+encountered 1608
+encountered 1608
+encountered 1612
+encountered 1608
+encountered 1608
+encountered 1608
+encountered 1608
+encountered 1612
+encountered 1608
+encountered 1608
+encountered 1608
+encountered 1608
+encountered 1612
+encountered 1608
+encountered 1616
+encountered 1612
+encountered 1612
+encountered 1612
+encountered 1608
+encountered 1608
+encountered 1608
+encountered 1612
+encountered 1608
+encountered 1608
+encountered 1608
+encountered 1608
+encountered 1612
+encountered 1608
+encountered 1608
+encountered 1608
+encountered 1608
+encountered 1612
+encountered 1608
+encountered 1608
+encountered 1608
+encountered 1608
+encountered 1612
+encountered 1608
+encountered 1616
+encountered 1612
+encountered 1612
+encountered 1612
+encountered 1608
+encountered 1608
+encountered 1608
+encountered 1612
+encountered 1608
+encountered 1608
+encountered 1608
+encountered 1608
+encountered 1612
+encountered 1608
+encountered 1608
+encountered 1608
+encountered 1608
+encountered 1612
+encountered 1608
+encountered 1608
+encountered 1608
+encountered 1608
+encountered 1612
+encountered 1608
+encountered 1616
+encountered 1612
+encountered 1616
+encountered 1616
+encountered 1612
+encountered 1612
+encountered 1608
+encountered 1608
+encountered 1608
+encountered 1612
+encountered 1608
+encountered 1608
+encountered 1608
+encountered 1608
+encountered 1612
+encountered 1608
+encountered 1608
+encountered 1608
+encountered 1608
+encountered 1612
+encountered 1608
+encountered 1608
+encountered 1608
+encountered 1608
+encountered 1612
+encountered 1608
+encountered 1616
+encountered 1612
+encountered 1612
+encountered 1612
+encountered 1608
+encountered 1608
+encountered 1608
+encountered 1612
+encountered 1608
+encountered 1608
+encountered 1608
+encountered 1608
+encountered 1612
+encountered 1608
+encountered 1608
+encountered 1608
+encountered 1608
+encountered 1612
+encountered 1608
+encountered 1608
+encountered 1608
+encountered 1608
+encountered 1612
+encountered 1608
+encountered 1616
+encountered 1612
+census {1608 => 128 1612 => 56 1616 => 12 }, 
+inlined
+`Apply (`Primitive "concatMap",
+        [`Lambda ([1616],
+                  `Singleton `Apply (`Primitive "concatMap",
+                                     [`Lambda ([1612],
+                                               `If (`Apply (`Primitive "==",
+                                                            [`Project 
+                                                             ("a",
+                                                              `Variable 1616);
+                                                             `Project 
+                                                             ("a",
+                                                              `Variable 1612)]),
+                                                    `Singleton `Apply 
+                                                               (`Primitive "concatMap",
+                                                                [`Lambda 
+                                                                 ([1608],
+                                                                  `If 
+                                                                  (`Apply 
+                                                                   (`Primitive "==",
+                                                                    [`Project 
+                                                                    ("b",
+                                                                    `Variable 1612);
+                                                                    `Project 
+                                                                    ("b",
+                                                                    `Variable 1608)]),
+                                                                   `Singleton 
+                                                                   `Project 
+                                                                   ("v",
+                                                                    `Variable 1608),
+                                                                   Some
+                                                                    `Concat 
+                                                                    []));
+                                                                 `Table 
+                                                                 ((...,
+                                                                   "postgresql:nested2:localhost:5432:stefan:links"),
+                                                                  "t3",
+                                                                  [["b"; "v"]],
+                                                                  ({"b" => 
+                                                                    (`Present,
+                                                                    `Primitive `Int) 
+                                                                   "v" => 
+                                                                   (`Present,
+                                                                    `Primitive `Int) }, ,
+                                                                   ...))]),
+                                                    Some `Concat []));
+                                      `Table ((...,
+                                               "postgresql:nested2:localhost:5432:stefan:links"),
+                                              "t2", [["a"; "b"]],
+                                              ({"a" => (`Present,
+                                                        `Primitive `Int) 
+                                               "b" => (`Present,
+                                                       `Primitive `Int) }, ,
+                                               ...))]));
+         `Table ((..., "postgresql:nested2:localhost:5432:stefan:links"),
+                 "t1", [["a"]],
+                 ({"a" => (`Present, `Primitive `Int) }, , ...))])
+>>>>> boxed
+`Apply ((`Primitive "concatMap",
+         [`Lambda (([1616],
+                    `Singleton (`Box (`Apply ((`Primitive "concatMap",
+                                               [`Lambda (([1612],
+                                                          `If ((`Apply 
+                                                                ((`Primitive "==",
+                                                                  [`Project 
+                                                                   (("a",
+                                                                    `Variable 
+                                                                    (1616,
+                                                                    `Atom)),
+                                                                    `Atom);
+                                                                   `Project 
+                                                                   (("a",
+                                                                    `Variable 
+                                                                    (1612,
+                                                                    `Atom)),
+                                                                    `Atom)]),
+                                                                 `Atom),
+                                                                `Singleton 
+                                                                (`Box 
+                                                                 (`Apply 
+                                                                  ((`Primitive "concatMap",
+                                                                    [`Lambda 
+                                                                    (([1608],
+                                                                    `If 
+                                                                    ((`Apply 
+                                                                    ((`Primitive "==",
+                                                                    [`Project 
+                                                                    (("b",
+                                                                    `Variable 
+                                                                    (1612,
+                                                                    `Atom)),
+                                                                    `Atom);
+                                                                    `Project 
+                                                                    (("b",
+                                                                    `Variable 
+                                                                    (1608,
+                                                                    `Atom)),
+                                                                    `Atom)]),
+                                                                    `Atom),
+                                                                    `Singleton 
+                                                                    (`Project 
+                                                                    (("v",
+                                                                    `Variable 
+                                                                    (1608,
+                                                                    `Atom)),
+                                                                    `Atom),
+                                                                    `List),
+                                                                    Some
+                                                                    `Concat 
+                                                                    ([],
+                                                                    `List)),
+                                                                    `List)),
+                                                                    `List);
+                                                                    `Table 
+                                                                    (((...,
+                                                                    "postgresql:nested2:localhost:5432:stefan:links"),
+                                                                    "t3",
+                                                                    [["b";
+                                                                    "v"]],
+                                                                    ({
+                                                                    "b" => 
+                                                                    (`Present,
+                                                                    `Primitive `Int) 
+                                                                    "v" => 
+                                                                    (`Present,
+                                                                    `Primitive `Int) }, ,
+                                                                    ...)),
+                                                                    `List)]),
+                                                                   `List),
+                                                                  `Atom),
+                                                                 `List),
+                                                                Some
+                                                                  `Concat 
+                                                                  ([], `List)),
+                                                               `List)),
+                                                         `List);
+                                                `Table (((...,
+                                                          "postgresql:nested2:localhost:5432:stefan:links"),
+                                                         "t2", [["a"; "b"]],
+                                                         ({"a" => (`Present,
+                                                                   `Primitive `Int) 
+                                                          "b" => (`Present,
+                                                                  `Primitive `Int) }, ,
+                                                          ...)), `List)]),
+                                              `List), `Atom), `List)), `List);
+          `Table (((..., "postgresql:nested2:localhost:5432:stefan:links"),
+                   "t1", [["a"]],
+                   ({"a" => (`Present, `Primitive `Int) }, , ...)), `List)]),
+        `List)
+Qr.pipeline time: 2
+not triggered antijoin rewrite for `Lambda (([1616],
+          `Singleton (`Box (`Apply ((`Primitive "concatMap",
+                                     [`Lambda (([1612],
+                                                `If ((`Apply ((`Primitive "==",
+                                                               [`Project 
+                                                                (("a",
+                                                                  `Variable 
+                                                                  (1616,
+                                                                   `Atom)),
+                                                                 `Atom);
+                                                                `Project 
+                                                                (("a",
+                                                                  `Variable 
+                                                                  (1612,
+                                                                   `Atom)),
+                                                                 `Atom)]),
+                                                              `Atom),
+                                                      `Singleton (`Box 
+                                                                  (`Apply 
+                                                                   ((`Primitive "concatMap",
+                                                                    [`Lambda 
+                                                                    (([1608],
+                                                                    `If 
+                                                                    ((`Apply 
+                                                                    ((`Primitive "==",
+                                                                    [`Project 
+                                                                    (("b",
+                                                                    `Variable 
+                                                                    (1612,
+                                                                    `Atom)),
+                                                                    `Atom);
+                                                                    `Project 
+                                                                    (("b",
+                                                                    `Variable 
+                                                                    (1608,
+                                                                    `Atom)),
+                                                                    `Atom)]),
+                                                                    `Atom),
+                                                                    `Singleton 
+                                                                    (`Project 
+                                                                    (("v",
+                                                                    `Variable 
+                                                                    (1608,
+                                                                    `Atom)),
+                                                                    `Atom),
+                                                                    `List),
+                                                                    Some
+                                                                    `Concat 
+                                                                    ([],
+                                                                    `List)),
+                                                                    `List)),
+                                                                    `List);
+                                                                    `Table 
+                                                                    (((...,
+                                                                    "postgresql:nested2:localhost:5432:stefan:links"),
+                                                                    "t3",
+                                                                    [["b";
+                                                                    "v"]],
+                                                                    ({
+                                                                    "b" => 
+                                                                    (`Present,
+                                                                    `Primitive `Int) 
+                                                                    "v" => 
+                                                                    (`Present,
+                                                                    `Primitive `Int) }, ,
+                                                                    ...)),
+                                                                    `List)]),
+                                                                    `List),
+                                                                   `Atom),
+                                                                  `List),
+                                                      Some
+                                                        `Concat ([], `List)),
+                                                     `List)), `List);
+                                      `Table (((...,
+                                                "postgresql:nested2:localhost:5432:stefan:links"),
+                                               "t2", [["a"; "b"]],
+                                               ({"a" => (`Present,
+                                                         `Primitive `Int) 
+                                                "b" => (`Present,
+                                                        `Primitive `Int) }, ,
+                                                ...)), `List)]), `List),
+                            `Atom), `List)), `List)
+triggering antijoin rewrite
+triggering antijoin rewrite
+QrToAlgebra.compile time: 0
+>>>> pfopt 0
+>>>> pfsql 0
+>>>> Executing query
+
+SELECT 1 AS iter3_nat, ROW_NUMBER () OVER (ORDER BY a0000.a ASC) AS iter2_nat
+   FROM t1 AS a0000
+  ORDER BY a0000.a ASC;
+
+>>>> pfopt 1
+>>>> pfsql 1
+>>>> Executing query
+
+WITH
+-- binding due to rownum operator
+t0000 (item3_int, iter4_nat) AS
+  (SELECT a0000.a AS item3_int,
+          ROW_NUMBER () OVER (ORDER BY a0000.a ASC) AS iter4_nat
+     FROM t1 AS a0000),
+
+-- binding due to rownum operator
+t0001 (item3_int, iter4_nat, item1_int, item2_int, iter11_nat) AS
+  (SELECT a0001.item3_int, a0001.iter4_nat, a0002.a AS item1_int,
+          a0002.b AS item2_int,
+          ROW_NUMBER () OVER
+          (ORDER BY a0001.iter4_nat ASC, a0002.a ASC, a0002.b ASC) AS iter11_nat
+     FROM t0000 AS a0001,
+          t2 AS a0002)
+
+SELECT a0003.iter11_nat AS iter9_nat, a0003.iter4_nat AS iter6_nat
+   FROM t0001 AS a0003
+  WHERE a0003.item3_int = a0003.item1_int
+  ORDER BY a0003.iter4_nat ASC, a0003.iter11_nat ASC;
+
+>>>> pfopt 2
+>>>> pfsql 2
+>>>> Executing query
+
+WITH
+-- binding due to rank operator
+t0000 (item3_int, item1_int, item2_int, iter28_nat) AS
+  (SELECT a0001.a AS item3_int, a0002.a AS item1_int, a0002.b AS item2_int,
+          DENSE_RANK () OVER (ORDER BY a0001.a ASC, a0002.a ASC, a0002.b ASC) AS
+          iter28_nat
+     FROM t1 AS a0001,
+          t2 AS a0002)
+
+SELECT a0003.iter28_nat AS iter22_nat, a0000.v AS item21_int
+   FROM t3 AS a0000,
+        t0000 AS a0003,
+        t0000 AS a0004,
+        t0000 AS a0005,
+        t0000 AS a0006,
+        t0000 AS a0007
+  WHERE a0003.iter28_nat = a0004.iter28_nat
+    AND a0003.iter28_nat = a0005.iter28_nat
+    AND a0006.iter28_nat = a0007.iter28_nat
+    AND a0003.iter28_nat = a0006.iter28_nat
+    AND a0006.item3_int = a0007.item1_int
+    AND a0003.item3_int = a0004.item1_int
+    AND a0000.b = a0005.item2_int
+  ORDER BY a0003.iter28_nat ASC, a0003.iter28_nat ASC, a0000.b ASC, a0000.v ASC;
+
+execute_queries time: 94
+value_from_table time: 22
+remaining freevars {}
+primitive_free_vars {15, 38, 39, 117}
+>>>>> before
+`Let ([(117, `Primitive "AsList"); (39, `Primitive "Cons"); (38, `Concat []);
+       (15, `Primitive "==");
+       (1576,
+        `Table ((..., "postgresql:nested2:localhost:5432:stefan:links"),
+                "t4", [["b"; "v"]],
+                ({"b" => (`Present, `Primitive `Int) "v" => (`Present,
+                                                             `Primitive `Int) }, ,
+                 ...)));
+       (1574,
+        `Table ((..., "postgresql:nested2:localhost:5432:stefan:links"),
+                "t2", [["a"; "b"]],
+                ({"a" => (`Present, `Primitive `Int) "b" => (`Present,
+                                                             `Primitive `Int) }, ,
+                 ...)));
+       (1573,
+        `Table ((..., "postgresql:nested2:localhost:5432:stefan:links"),
+                "t1", [["a"]],
+                ({"a" => (`Present, `Primitive `Int) }, , ...)));
+       (159, `Primitive "concatMap");
+       (1599,
+        `Lambda ([1598],
+                 `Let ([(1584, `Variable 1598); (1585, `Variable 1598);
+                        (1597,
+                         `Let ([(1595,
+                                 `Lambda ([1594],
+                                          `Let ([(1586, `Variable 1594);
+                                                 (1587, `Variable 1594)],
+                                                `If (`Apply (`Variable 15,
+                                                             [`Project 
+                                                              ("a",
+                                                               `Variable 1585);
+                                                              `Project 
+                                                              ("a",
+                                                               `Variable 1587)]),
+                                                     `Let ([(1593,
+                                                             `Let ([(1591,
+                                                                    `Lambda 
+                                                                    ([1590],
+                                                                    `Let 
+                                                                    ([(1588,
+                                                                    `Variable 1590);
+                                                                    (1589,
+                                                                    `Variable 1590)],
+                                                                    `If 
+                                                                    (`Apply 
+                                                                    (`Variable 15,
+                                                                    [`Project 
+                                                                    ("b",
+                                                                    `Variable 1587);
+                                                                    `Project 
+                                                                    ("b",
+                                                                    `Variable 1589)]),
+                                                                    `Let 
+                                                                    ([],
+                                                                    `Apply 
+                                                                    (`Variable 39,
+                                                                    [`Project 
+                                                                    ("v",
+                                                                    `Variable 1589);
+                                                                    `Variable 38])),
+                                                                    Some
+                                                                    `Let 
+                                                                    ([],
+                                                                    `Variable 38)))));
+                                                                    (1592,
+                                                                    `Apply 
+                                                                    (`Variable 117,
+                                                                    [`Variable 1576]))],
+                                                                   `Apply 
+                                                                   (`Variable 159,
+                                                                    [`Variable 1591;
+                                                                    `Variable 1592])))],
+                                                           `Apply (`Variable 39,
+                                                                   [`Variable 1593;
+                                                                    `Variable 38])),
+                                                     Some
+                                                       `Let ([],
+                                                             `Variable 38)))));
+                                (1596,
+                                 `Apply (`Variable 117, [`Variable 1574]))],
+                               `Apply (`Variable 159,
+                                       [`Variable 1595; `Variable 1596])))],
+                       `Apply (`Variable 39, [`Variable 1597; `Variable 38]))));
+       (1600, `Apply (`Variable 117, [`Variable 1573]))],
+      `Apply (`Variable 159, [`Variable 1599; `Variable 1600]))
+encountered 1598
+encountered 1598
+encountered 1594
+encountered 1594
+encountered 38
+encountered 1590
+encountered 1590
+encountered 38
+encountered 1589
+encountered 38
+encountered 39
+encountered 1587
+encountered 1589
+encountered 15
+encountered 1576
+encountered 117
+encountered 1591
+encountered 1592
+encountered 159
+encountered 1593
+encountered 38
+encountered 39
+encountered 1585
+encountered 1587
+encountered 15
+encountered 1574
+encountered 117
+encountered 1595
+encountered 1596
+encountered 159
+encountered 1597
+encountered 38
+encountered 39
+encountered 1573
+encountered 117
+encountered 1599
+encountered 1600
+encountered 159
+census {15 => 2 38 => 5 39 => 3 117 => 3 159 => 3 1573 => 1 1574 => 1 1576 => 1 
+1585 => 1 1587 => 2 1589 => 2 1590 => 2 1591 => 1 1592 => 1 1593 => 1 
+1594 => 2 1595 => 1 1596 => 1 1597 => 1 1598 => 2 1599 => 1 1600 => 1 }, 
+>>>>> inliner
+encountered 1594
+encountered 1594
+encountered 1590
+encountered 1590
+encountered 1590
+encountered 1594
+encountered 1590
+encountered 1590
+encountered 1590
+encountered 1590
+encountered 1594
+encountered 1590
+encountered 1590
+encountered 1590
+encountered 1590
+encountered 1594
+encountered 1590
+encountered 1590
+encountered 1590
+encountered 1590
+encountered 1594
+encountered 1590
+encountered 1598
+encountered 1594
+encountered 1594
+encountered 1594
+encountered 1590
+encountered 1590
+encountered 1590
+encountered 1594
+encountered 1590
+encountered 1590
+encountered 1590
+encountered 1590
+encountered 1594
+encountered 1590
+encountered 1590
+encountered 1590
+encountered 1590
+encountered 1594
+encountered 1590
+encountered 1590
+encountered 1590
+encountered 1590
+encountered 1594
+encountered 1590
+encountered 1598
+encountered 1594
+encountered 1598
+encountered 1598
+encountered 1594
+encountered 1594
+encountered 1590
+encountered 1590
+encountered 1590
+encountered 1594
+encountered 1590
+encountered 1590
+encountered 1590
+encountered 1590
+encountered 1594
+encountered 1590
+encountered 1590
+encountered 1590
+encountered 1590
+encountered 1594
+encountered 1590
+encountered 1590
+encountered 1590
+encountered 1590
+encountered 1594
+encountered 1590
+encountered 1598
+encountered 1594
+encountered 1594
+encountered 1594
+encountered 1590
+encountered 1590
+encountered 1590
+encountered 1594
+encountered 1590
+encountered 1590
+encountered 1590
+encountered 1590
+encountered 1594
+encountered 1590
+encountered 1590
+encountered 1590
+encountered 1590
+encountered 1594
+encountered 1590
+encountered 1590
+encountered 1590
+encountered 1590
+encountered 1594
+encountered 1590
+encountered 1598
+encountered 1594
+encountered 1594
+encountered 1594
+encountered 1590
+encountered 1590
+encountered 1590
+encountered 1594
+encountered 1590
+encountered 1590
+encountered 1590
+encountered 1590
+encountered 1594
+encountered 1590
+encountered 1590
+encountered 1590
+encountered 1590
+encountered 1594
+encountered 1590
+encountered 1590
+encountered 1590
+encountered 1590
+encountered 1594
+encountered 1590
+encountered 1598
+encountered 1594
+encountered 1594
+encountered 1594
+encountered 1590
+encountered 1590
+encountered 1590
+encountered 1594
+encountered 1590
+encountered 1590
+encountered 1590
+encountered 1590
+encountered 1594
+encountered 1590
+encountered 1590
+encountered 1590
+encountered 1590
+encountered 1594
+encountered 1590
+encountered 1590
+encountered 1590
+encountered 1590
+encountered 1594
+encountered 1590
+encountered 1598
+encountered 1594
+encountered 1598
+encountered 1598
+encountered 1594
+encountered 1594
+encountered 1590
+encountered 1590
+encountered 1590
+encountered 1594
+encountered 1590
+encountered 1590
+encountered 1590
+encountered 1590
+encountered 1594
+encountered 1590
+encountered 1590
+encountered 1590
+encountered 1590
+encountered 1594
+encountered 1590
+encountered 1590
+encountered 1590
+encountered 1590
+encountered 1594
+encountered 1590
+encountered 1598
+encountered 1594
+encountered 1594
+encountered 1594
+encountered 1590
+encountered 1590
+encountered 1590
+encountered 1594
+encountered 1590
+encountered 1590
+encountered 1590
+encountered 1590
+encountered 1594
+encountered 1590
+encountered 1590
+encountered 1590
+encountered 1590
+encountered 1594
+encountered 1590
+encountered 1590
+encountered 1590
+encountered 1590
+encountered 1594
+encountered 1590
+encountered 1598
+encountered 1594
+census {1590 => 128 1594 => 56 1598 => 12 }, 
+inlined
+`Apply (`Primitive "concatMap",
+        [`Lambda ([1598],
+                  `Singleton `Apply (`Primitive "concatMap",
+                                     [`Lambda ([1594],
+                                               `If (`Apply (`Primitive "==",
+                                                            [`Project 
+                                                             ("a",
+                                                              `Variable 1598);
+                                                             `Project 
+                                                             ("a",
+                                                              `Variable 1594)]),
+                                                    `Singleton `Apply 
+                                                               (`Primitive "concatMap",
+                                                                [`Lambda 
+                                                                 ([1590],
+                                                                  `If 
+                                                                  (`Apply 
+                                                                   (`Primitive "==",
+                                                                    [`Project 
+                                                                    ("b",
+                                                                    `Variable 1594);
+                                                                    `Project 
+                                                                    ("b",
+                                                                    `Variable 1590)]),
+                                                                   `Singleton 
+                                                                   `Project 
+                                                                   ("v",
+                                                                    `Variable 1590),
+                                                                   Some
+                                                                    `Concat 
+                                                                    []));
+                                                                 `Table 
+                                                                 ((...,
+                                                                   "postgresql:nested2:localhost:5432:stefan:links"),
+                                                                  "t4",
+                                                                  [["b"; "v"]],
+                                                                  ({"b" => 
+                                                                    (`Present,
+                                                                    `Primitive `Int) 
+                                                                   "v" => 
+                                                                   (`Present,
+                                                                    `Primitive `Int) }, ,
+                                                                   ...))]),
+                                                    Some `Concat []));
+                                      `Table ((...,
+                                               "postgresql:nested2:localhost:5432:stefan:links"),
+                                              "t2", [["a"; "b"]],
+                                              ({"a" => (`Present,
+                                                        `Primitive `Int) 
+                                               "b" => (`Present,
+                                                       `Primitive `Int) }, ,
+                                               ...))]));
+         `Table ((..., "postgresql:nested2:localhost:5432:stefan:links"),
+                 "t1", [["a"]],
+                 ({"a" => (`Present, `Primitive `Int) }, , ...))])
+>>>>> boxed
+`Apply ((`Primitive "concatMap",
+         [`Lambda (([1598],
+                    `Singleton (`Box (`Apply ((`Primitive "concatMap",
+                                               [`Lambda (([1594],
+                                                          `If ((`Apply 
+                                                                ((`Primitive "==",
+                                                                  [`Project 
+                                                                   (("a",
+                                                                    `Variable 
+                                                                    (1598,
+                                                                    `Atom)),
+                                                                    `Atom);
+                                                                   `Project 
+                                                                   (("a",
+                                                                    `Variable 
+                                                                    (1594,
+                                                                    `Atom)),
+                                                                    `Atom)]),
+                                                                 `Atom),
+                                                                `Singleton 
+                                                                (`Box 
+                                                                 (`Apply 
+                                                                  ((`Primitive "concatMap",
+                                                                    [`Lambda 
+                                                                    (([1590],
+                                                                    `If 
+                                                                    ((`Apply 
+                                                                    ((`Primitive "==",
+                                                                    [`Project 
+                                                                    (("b",
+                                                                    `Variable 
+                                                                    (1594,
+                                                                    `Atom)),
+                                                                    `Atom);
+                                                                    `Project 
+                                                                    (("b",
+                                                                    `Variable 
+                                                                    (1590,
+                                                                    `Atom)),
+                                                                    `Atom)]),
+                                                                    `Atom),
+                                                                    `Singleton 
+                                                                    (`Project 
+                                                                    (("v",
+                                                                    `Variable 
+                                                                    (1590,
+                                                                    `Atom)),
+                                                                    `Atom),
+                                                                    `List),
+                                                                    Some
+                                                                    `Concat 
+                                                                    ([],
+                                                                    `List)),
+                                                                    `List)),
+                                                                    `List);
+                                                                    `Table 
+                                                                    (((...,
+                                                                    "postgresql:nested2:localhost:5432:stefan:links"),
+                                                                    "t4",
+                                                                    [["b";
+                                                                    "v"]],
+                                                                    ({
+                                                                    "b" => 
+                                                                    (`Present,
+                                                                    `Primitive `Int) 
+                                                                    "v" => 
+                                                                    (`Present,
+                                                                    `Primitive `Int) }, ,
+                                                                    ...)),
+                                                                    `List)]),
+                                                                   `List),
+                                                                  `Atom),
+                                                                 `List),
+                                                                Some
+                                                                  `Concat 
+                                                                  ([], `List)),
+                                                               `List)),
+                                                         `List);
+                                                `Table (((...,
+                                                          "postgresql:nested2:localhost:5432:stefan:links"),
+                                                         "t2", [["a"; "b"]],
+                                                         ({"a" => (`Present,
+                                                                   `Primitive `Int) 
+                                                          "b" => (`Present,
+                                                                  `Primitive `Int) }, ,
+                                                          ...)), `List)]),
+                                              `List), `Atom), `List)), `List);
+          `Table (((..., "postgresql:nested2:localhost:5432:stefan:links"),
+                   "t1", [["a"]],
+                   ({"a" => (`Present, `Primitive `Int) }, , ...)), `List)]),
+        `List)
+Qr.pipeline time: 1
+not triggered antijoin rewrite for `Lambda (([1598],
+          `Singleton (`Box (`Apply ((`Primitive "concatMap",
+                                     [`Lambda (([1594],
+                                                `If ((`Apply ((`Primitive "==",
+                                                               [`Project 
+                                                                (("a",
+                                                                  `Variable 
+                                                                  (1598,
+                                                                   `Atom)),
+                                                                 `Atom);
+                                                                `Project 
+                                                                (("a",
+                                                                  `Variable 
+                                                                  (1594,
+                                                                   `Atom)),
+                                                                 `Atom)]),
+                                                              `Atom),
+                                                      `Singleton (`Box 
+                                                                  (`Apply 
+                                                                   ((`Primitive "concatMap",
+                                                                    [`Lambda 
+                                                                    (([1590],
+                                                                    `If 
+                                                                    ((`Apply 
+                                                                    ((`Primitive "==",
+                                                                    [`Project 
+                                                                    (("b",
+                                                                    `Variable 
+                                                                    (1594,
+                                                                    `Atom)),
+                                                                    `Atom);
+                                                                    `Project 
+                                                                    (("b",
+                                                                    `Variable 
+                                                                    (1590,
+                                                                    `Atom)),
+                                                                    `Atom)]),
+                                                                    `Atom),
+                                                                    `Singleton 
+                                                                    (`Project 
+                                                                    (("v",
+                                                                    `Variable 
+                                                                    (1590,
+                                                                    `Atom)),
+                                                                    `Atom),
+                                                                    `List),
+                                                                    Some
+                                                                    `Concat 
+                                                                    ([],
+                                                                    `List)),
+                                                                    `List)),
+                                                                    `List);
+                                                                    `Table 
+                                                                    (((...,
+                                                                    "postgresql:nested2:localhost:5432:stefan:links"),
+                                                                    "t4",
+                                                                    [["b";
+                                                                    "v"]],
+                                                                    ({
+                                                                    "b" => 
+                                                                    (`Present,
+                                                                    `Primitive `Int) 
+                                                                    "v" => 
+                                                                    (`Present,
+                                                                    `Primitive `Int) }, ,
+                                                                    ...)),
+                                                                    `List)]),
+                                                                    `List),
+                                                                   `Atom),
+                                                                  `List),
+                                                      Some
+                                                        `Concat ([], `List)),
+                                                     `List)), `List);
+                                      `Table (((...,
+                                                "postgresql:nested2:localhost:5432:stefan:links"),
+                                               "t2", [["a"; "b"]],
+                                               ({"a" => (`Present,
+                                                         `Primitive `Int) 
+                                                "b" => (`Present,
+                                                        `Primitive `Int) }, ,
+                                                ...)), `List)]), `List),
+                            `Atom), `List)), `List)
+triggering antijoin rewrite
+triggering antijoin rewrite
+QrToAlgebra.compile time: 0
+>>>> pfopt 3
+>>>> pfsql 3
+>>>> Executing query
+
+SELECT 1 AS iter3_nat, ROW_NUMBER () OVER (ORDER BY a0000.a ASC) AS iter2_nat
+   FROM t1 AS a0000
+  ORDER BY a0000.a ASC;
+
+>>>> pfopt 4
+>>>> pfsql 4
+>>>> Executing query
+
+WITH
+-- binding due to rownum operator
+t0000 (item3_int, iter4_nat) AS
+  (SELECT a0000.a AS item3_int,
+          ROW_NUMBER () OVER (ORDER BY a0000.a ASC) AS iter4_nat
+     FROM t1 AS a0000),
+
+-- binding due to rownum operator
+t0001 (item3_int, iter4_nat, item1_int, item2_int, iter11_nat) AS
+  (SELECT a0001.item3_int, a0001.iter4_nat, a0002.a AS item1_int,
+          a0002.b AS item2_int,
+          ROW_NUMBER () OVER
+          (ORDER BY a0001.iter4_nat ASC, a0002.a ASC, a0002.b ASC) AS iter11_nat
+     FROM t0000 AS a0001,
+          t2 AS a0002)
+
+SELECT a0003.iter11_nat AS iter9_nat, a0003.iter4_nat AS iter6_nat
+   FROM t0001 AS a0003
+  WHERE a0003.item3_int = a0003.item1_int
+  ORDER BY a0003.iter4_nat ASC, a0003.iter11_nat ASC;
+
+>>>> pfopt 5
+>>>> pfsql 5
+>>>> Executing query
+
+WITH
+-- binding due to rank operator
+t0000 (item3_int, item1_int, item2_int, iter28_nat) AS
+  (SELECT a0001.a AS item3_int, a0002.a AS item1_int, a0002.b AS item2_int,
+          DENSE_RANK () OVER (ORDER BY a0001.a ASC, a0002.a ASC, a0002.b ASC) AS
+          iter28_nat
+     FROM t1 AS a0001,
+          t2 AS a0002)
+
+SELECT a0003.iter28_nat AS iter22_nat, a0000.v AS item21_int
+   FROM t4 AS a0000,
+        t0000 AS a0003,
+        t0000 AS a0004,
+        t0000 AS a0005,
+        t0000 AS a0006,
+        t0000 AS a0007
+  WHERE a0003.iter28_nat = a0004.iter28_nat
+    AND a0003.iter28_nat = a0005.iter28_nat
+    AND a0006.iter28_nat = a0007.iter28_nat
+    AND a0003.iter28_nat = a0006.iter28_nat
+    AND a0006.item3_int = a0007.item1_int
+    AND a0003.item3_int = a0004.item1_int
+    AND a0000.b = a0005.item2_int
+  ORDER BY a0003.iter28_nat ASC, a0003.iter28_nat ASC, a0000.b ASC, a0000.v ASC;
+
+execute_queries time: 65
+value_from_table time: 23
+[[[16579, 20740, 24855, 25072, 30466, 
+
+rest of the result here...
+
+real    0m0.281s
+user    0m0.187s
+sys     0m0.013s
+** Shredding
+
+Doesn't work for some reason...
+
+*** Raw
+stefan@stefan-work:~/src/links.shredding/benchmarks (detached from 275c880)$ time ~/src/links.shredding/links --config=config nested2.links 
+Unknown setting: pf_path
+Unknown setting: print_sql_queries
+No valid  cache for prelude.links
+compiling to IR
+compiled IR
+Caching prelude.links.cache
+No valid  cache for nested2.links
+compiling to IR
+compiled IR
+Caching nested2.links.cache
+Generated query: (select 0 as dummy from t1 as t1623) union all (select 0 as dummy from t1 as t1626)
+ *** Fatal error : Internal error: attempt to extract a row from a datatype that is not a record or a variant: [[Int]]
+
+real    0m0.132s
+user    0m0.127s
+sys     0m0.003s
